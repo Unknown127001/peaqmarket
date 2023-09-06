@@ -1,108 +1,870 @@
+import React from "react";
 import { ConnectWallet } from "@thirdweb-dev/react";
+import {Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, Button, ButtonGroup, NavbarMenuToggle, NavbarMenu, NavbarMenuItem, Card, CardBody, Input, Image, CardFooter, CardHeader,Divider} from "@nextui-org/react";
 import styles from "../styles/Home.module.css";
-import Image from "next/image";
+import {AcmeLogo} from "./AcmeLogo";
+import {SearchIcon} from "./SearchIcon";
+import {MoonIcon} from "./moon";
+import {SunIcon} from "./sun";
 import { NextPage } from "next";
+import {useTheme} from "next-themes";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {faCertificate,faThumbtack,faFire} from '@fortawesome/free-solid-svg-icons';
 
 const Home: NextPage = () => {
+  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+  const { theme, setTheme } = useTheme();
+
+  const menuItems = [
+    "Explore",
+    "Projects",
+    "Activity",
+    "Analytics",
+    "System",
+    "Sponsors",
+    "Help & Feedback",
+  ];
+
   return (
-    <main className={styles.main}>
-      <div className={styles.container}>
-        <div className={styles.header}>
-          <h1 className={styles.title}>
-            Welcome to{" "}
-            <span className={styles.gradientText0}>
-              <a
-                href="https://thirdweb.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                thirdweb.
-              </a>
-            </span>
-          </h1>
+    <div>
+ <Navbar
+      isBordered
+      isMenuOpen={isMenuOpen}
+      onMenuOpenChange={setIsMenuOpen}
+    >
+      <NavbarContent className="sm:hidden" justify="start">
+        <NavbarMenuToggle aria-label={isMenuOpen ? "Close menu" : "Open menu"} />
+      </NavbarContent>
 
-          <p className={styles.description}>
-            Get started by configuring your desired network in{" "}
-            <code className={styles.code}>src/index.js</code>, then modify the{" "}
-            <code className={styles.code}>src/App.js</code> file!
-          </p>
+      <NavbarContent className="sm:hidden pr-3" justify="center">
+        <NavbarBrand>
+          <AcmeLogo />
+          <p className="font-bold text-inherit">Peaq Market</p>
+        </NavbarBrand>
+      </NavbarContent>
 
-          <div className={styles.connect}>
-            <ConnectWallet
-              dropdownPosition={{
-                side: "bottom",
-                align: "center",
-              }}
-            />
-          </div>
+      <NavbarContent className="hidden sm:flex gap-4" justify="center">
+        <NavbarBrand>
+          <AcmeLogo />
+          <p className="font-bold text-inherit">Peaq Market</p>
+        </NavbarBrand>
+        <NavbarItem>
+          <Link color="foreground" href="#">
+            Explore
+          </Link>
+        </NavbarItem>
+        <NavbarItem isActive>
+          <Link href="#" aria-current="page">
+            Projects
+          </Link>
+        </NavbarItem>
+        <NavbarItem>
+          <Link color="foreground" href="#">
+            Integrations
+          </Link>
+        </NavbarItem>
+      </NavbarContent>
+
+      <NavbarContent justify="end">
+        <NavbarItem>
+  <Button variant="ghost" onClick={() => setTheme('light')}><SunIcon/></Button>
+  <Button variant="ghost" onClick={() => setTheme('dark')}><MoonIcon/></Button>
+        </NavbarItem>
+      </NavbarContent>
+
+      <NavbarMenu>
+        {menuItems.map((item, index) => (
+          <NavbarMenuItem key={`${item}-${index}`}>
+            <Link
+              className="w-full"
+              color={
+                index === 0 ? "warning" : index === menuItems.length - 1 ? "danger" : "foreground"
+              }
+              href="#"
+              size="lg"
+            >
+              {item}
+            </Link>
+          </NavbarMenuItem>
+        ))}
+      </NavbarMenu>
+    </Navbar>
+    
+    <Card>
+      <CardBody>
+        <p className="justify-center text-center font-small">Connect your wallet to Explore all projects features</p>
+        <br></br>
+        <p className="justify-center text-center font-small">
+        <ConnectWallet theme={theme as ("light" | "dark" | undefined)}
+        modalTitle={"Connect to Peaq Market"}/></p>
+      </CardBody>
+    </Card>
+    <br></br>
+    <div>
+      <h1 className="font-bold">Explore all projects</h1><br></br>
+    </div>
+    <div className="flex items-center">
+  <Input
+    label="Search"
+    isClearable
+    radius="lg"
+    classNames={{
+      label: "text-black/50 dark:text-white/90",
+      input: [
+        "bg-transparent",
+        "text-black/90 dark:text-white/90",
+        "placeholder:text-default-700/50 dark:placeholder:text-white/60",
+      ],
+      innerWrapper: "bg-transparent",
+      inputWrapper: [
+        "shadow-xl",
+        "bg-default-200/50",
+        "dark:bg-default/60",
+        "backdrop-blur-xl",
+        "backdrop-saturate-200",
+        "hover:bg-default-200/70",
+        "dark:hover:bg-default/70",
+        "group-data-[focused=true]:bg-default-200/50",
+        "dark:group-data-[focused=true]:bg-default/60",
+        "!cursor-text",
+      ],
+    }}
+    placeholder="Type to search..."
+    startContent={
+      <SearchIcon className="text-black/50 dark:text-white/90 text-slate-400 pointer-events-none flex-shrink-0"/>
+    }
+  />
+  <div className="box-content flex justify-end gap-1 px-2 shadow-lg">
+  <Link isBlock href="#" color="foreground"><FontAwesomeIcon icon={faThumbtack} rotation={90} style={{color: "#47b70b",}}/>&nbsp;Featured</Link>
+  <Link isBlock href="#" color="foreground"><FontAwesomeIcon icon={faFire} style={{color: "#d34617",}}/>&nbsp;Newest</Link>
+  <Link isBlock href="#" color="foreground"><FontAwesomeIcon icon={faCertificate} style={{color: "#1c5ece",}} />&nbsp;Verified</Link>
+  </div>
+</div>
+<Divider/>
+<br></br>
+<div className="grid grid-cols-2 px-1 sm:grid-cols-4 gap-4 sm:px-5">
+<Card className="max-w-[400px]">
+      <CardHeader className="flex gap-3">
+        <Image
+          alt="nextui logo"
+          height={40}
+          radius="sm"
+          src="images/beagleswap.png"
+          width={40}
+        />
+        <div className="flex flex-col">
+          <p className="text-md">Beagleswap&nbsp;<FontAwesomeIcon icon={faCertificate} style={{color: "#1c5ece",}} /></p>
+          <p className="text-small text-default-500">Beagleswap.xyz</p>
         </div>
-
-        <div className={styles.grid}>
-          <a
-            href="https://portal.thirdweb.com/"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              src="/images/portal-preview.png"
-              alt="Placeholder preview of starter"
-              width={300}
-              height={200}
-            />
-            <div className={styles.cardText}>
-              <h2 className={styles.gradientText1}>Portal ➜</h2>
-              <p>
-                Guides, references, and resources that will help you build with
-                thirdweb.
-              </p>
-            </div>
-          </a>
-
-          <a
-            href="https://thirdweb.com/dashboard"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              src="/images/dashboard-preview.png"
-              alt="Placeholder preview of starter"
-              width={300}
-              height={200}
-            />
-            <div className={styles.cardText}>
-              <h2 className={styles.gradientText2}>Dashboard ➜</h2>
-              <p>
-                Deploy, configure, and manage your smart contracts from the
-                dashboard.
-              </p>
-            </div>
-          </a>
-
-          <a
-            href="https://thirdweb.com/templates"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              src="/images/templates-preview.png"
-              alt="Placeholder preview of templates"
-              width={300}
-              height={200}
-            />
-            <div className={styles.cardText}>
-              <h2 className={styles.gradientText3}>Templates ➜</h2>
-              <p>
-                Discover and clone template projects showcasing thirdweb
-                features.
-              </p>
-            </div>
-          </a>
+      </CardHeader>
+      <Divider/>
+      <CardBody>
+        <p>Explore Beagleswap Features</p>
+      </CardBody>
+      <Divider/>
+      <CardFooter>
+        <Link
+          isExternal
+          showAnchorIcon
+          href="/explore?project=Beagleswap"
+        >
+          Explore Beagleswap
+        </Link>
+      </CardFooter>
+    </Card><Card className="max-w-[400px]">
+      <CardHeader className="flex gap-3">
+        <Image
+          alt="nextui logo"
+          height={40}
+          radius="sm"
+          src="images/cashmere.webp"
+          width={40}
+        />
+        <div className="flex flex-col">
+          <p className="text-md">Cashmere Labs&nbsp;<FontAwesomeIcon icon={faCertificate} style={{color: "#1c5ece",}} /></p>
+          <p className="text-small text-default-500">cashmere.exchange</p>
         </div>
-      </div>
-    </main>
+      </CardHeader>
+      <Divider/>
+      <CardBody>
+        <p>Explore Cashmere Features</p>
+      </CardBody>
+      <Divider/>
+      <CardFooter>
+        <Link
+          isExternal
+          showAnchorIcon
+          href="/explore?project=Cashmere Labs"
+        >
+          Explore Cashmere
+        </Link>
+      </CardFooter>
+    </Card><Card className="max-w-[400px]">
+      <CardHeader className="flex gap-3">
+        <Image
+          alt="nextui logo"
+          height={40}
+          radius="sm"
+          src="images/plexus.webp"
+          width={40}
+        />
+        <div className="flex flex-col">
+          <p className="text-md">Plexus&nbsp;<FontAwesomeIcon icon={faCertificate} style={{color: "#1c5ece",}} /></p>
+          <p className="text-small text-default-500">plexus.app</p>
+        </div>
+      </CardHeader>
+      <Divider/>
+      <CardBody>
+        <p>Explore Plexus Features </p>
+      </CardBody>
+      <Divider/>
+      <CardFooter>
+        <Link
+          isExternal
+          showAnchorIcon
+          href="/explore?project=Plexus"
+        >
+          Explore Plexus
+        </Link>
+      </CardFooter>
+    </Card><Card className="max-w-[400px]">
+      <CardHeader className="flex gap-3">
+        <Image
+          alt="nextui logo"
+          height={40}
+          radius="sm"
+          src="images/robots.ico"
+          width={40}
+        />
+        <div className="flex flex-col">
+          <p className="text-md">Robots.Farm&nbsp;<FontAwesomeIcon icon={faCertificate} style={{color: "#1c5ece",}} /></p>
+          <p className="text-small text-default-500">robots.farm</p>
+        </div>
+      </CardHeader>
+      <Divider/>
+      <CardBody>
+        <p>Explore Robots.Farm Features</p>
+      </CardBody>
+      <Divider/>
+      <CardFooter>
+        <Link
+          isExternal
+          showAnchorIcon
+          href="/explore?project=Robots.Farms"
+        >
+          Explore Robots.Farms
+        </Link>
+      </CardFooter>
+    </Card><Card className="max-w-[400px]">
+      <CardHeader className="flex gap-3">
+        <Image
+          alt="nextui logo"
+          height={40}
+          radius="sm"
+          src="images/melon.ico"
+          width={40}
+        />
+        <div className="flex flex-col">
+          <p className="text-md">Melon.ooo&nbsp;<FontAwesomeIcon icon={faCertificate} style={{color: "#1c5ece",}} /></p>
+          <p className="text-small text-default-500">melon.ooo</p>
+        </div>
+      </CardHeader>
+      <Divider/>
+      <CardBody>
+        <p>Explore Melon.ooo Features</p>
+      </CardBody>
+      <Divider/>
+      <CardFooter>
+        <Link
+          isExternal
+          showAnchorIcon
+          href="/explore?project=Melon.ooo"
+        >
+          Explore Melon.ooo
+        </Link>
+      </CardFooter>
+    </Card>
+    <Card className="max-w-[400px]">
+      <CardHeader className="flex gap-3">
+        <Image
+          alt="nextui logo"
+          height={40}
+          radius="sm"
+          src="images/mantle.webp"
+          width={40}
+        />
+        <div className="flex flex-col">
+          <p className="text-md">Mantleswap&nbsp;<FontAwesomeIcon icon={faCertificate} style={{color: "#1c5ece",}} /></p>
+          <p className="text-small text-default-500">app.mantleswap.org</p>
+        </div>
+      </CardHeader>
+      <Divider/>
+      <CardBody>
+        <p>Explore Mantleswap Features</p>
+      </CardBody>
+      <Divider/>
+      <CardFooter>
+        <Link
+          isExternal
+          showAnchorIcon
+          href="/explore?project=Mantleswap"
+        >
+          Explore Mantleswap
+        </Link>
+      </CardFooter>
+    </Card>
+    <Card className="max-w-[400px]">
+      <CardHeader className="flex gap-3">
+        <Image
+          alt="nextui logo"
+          height={40}
+          radius="sm"
+          src="images/scroll.webp"
+          width={40}
+        />
+        <div className="flex flex-col">
+          <p className="text-md">Scroll&nbsp;<FontAwesomeIcon icon={faCertificate} style={{color: "#1c5ece",}} /></p>
+          <p className="text-small text-default-500">scroll.io</p>
+        </div>
+      </CardHeader>
+      <Divider/>
+      <CardBody>
+        <p>Explore Scroll Features</p>
+      </CardBody>
+      <Divider/>
+      <CardFooter>
+        <Link
+          isExternal
+          showAnchorIcon
+          href="/explore?project=Scroll"
+        >
+          Explore Scroll
+        </Link>
+      </CardFooter>
+    </Card>
+    <Card className="max-w-[400px]">
+      <CardHeader className="flex gap-3">
+        <Image
+          alt="nextui logo"
+          height={40}
+          radius="sm"
+          src="images/aark.ico"
+          width={40}
+        />
+        <div className="flex flex-col">
+          <p className="text-md">Aark Digital&nbsp;<FontAwesomeIcon icon={faCertificate} style={{color: "#1c5ece",}} /></p>
+          <p className="text-small text-default-500">aark.digital</p>
+        </div>
+      </CardHeader>
+      <Divider/>
+      <CardBody>
+        <p>Explore Aark Digital Features</p>
+      </CardBody>
+      <Divider/>
+      <CardFooter>
+        <Link
+          isExternal
+          showAnchorIcon
+          href="/explore?project=Aark Digital"
+        >
+          Explore Aark Digital
+        </Link>
+      </CardFooter>
+    </Card>
+    <Card className="max-w-[400px]">
+      <CardHeader className="flex gap-3">
+        <Image
+          alt="nextui logo"
+          height={40}
+          radius="sm"
+          src="images/dackie.ico"
+          width={40}
+        />
+        <div className="flex flex-col">
+          <p className="text-md">Dackieswap&nbsp;<FontAwesomeIcon icon={faCertificate} style={{color: "#1c5ece",}} /></p>
+          <p className="text-small text-default-500">dackieswap.xyz</p>
+        </div>
+      </CardHeader>
+      <Divider/>
+      <CardBody>
+        <p>Explore Dackieswap Features</p>
+      </CardBody>
+      <Divider/>
+      <CardFooter>
+        <Link
+          isExternal
+          showAnchorIcon
+          href="/explore?project=Dackieswap"
+        >
+          Explore Dackieswap
+        </Link>
+      </CardFooter>
+    </Card>
+    <Card className="max-w-[400px]">
+      <CardHeader className="flex gap-3">
+        <Image
+          alt="nextui logo"
+          height={40}
+          radius="sm"
+          src="images/sunflower.png"
+          width={40}
+        />
+        <div className="flex flex-col">
+          <p className="text-md">Sunflower Land&nbsp;<FontAwesomeIcon icon={faCertificate} style={{color: "#1c5ece",}} /></p>
+          <p className="text-small text-default-500">sunflower-land.com</p>
+        </div>
+      </CardHeader>
+      <Divider/>
+      <CardBody>
+        <p>Explore Sunflower Land Features</p>
+      </CardBody>
+      <Divider/>
+      <CardFooter>
+        <Link
+          isExternal
+          showAnchorIcon
+          href="/explore?project=Sunflower Land"
+        >
+          Explore Sunflower Land
+        </Link>
+      </CardFooter>
+    </Card><Card className="max-w-[400px]">
+      <CardHeader className="flex gap-3">
+        <Image
+          alt="nextui logo"
+          height={40}
+          radius="sm"
+          src="images/monsterra.webp"
+          width={40}
+        />
+        <div className="flex flex-col">
+          <p className="text-md">Monsterra&nbsp;<FontAwesomeIcon icon={faCertificate} style={{color: "#1c5ece",}} /></p>
+          <p className="text-small text-default-500">monsterra.io</p>
+        </div>
+      </CardHeader>
+      <Divider/>
+      <CardBody>
+        <p>Explore Monsterra Features</p>
+      </CardBody>
+      <Divider/>
+      <CardFooter>
+        <Link
+          isExternal
+          showAnchorIcon
+          href="/explore?project=Monsterra"
+        >
+          Explore Monsterra
+        </Link>
+      </CardFooter>
+    </Card>
+    <Card className="max-w-[400px]">
+      <CardHeader className="flex gap-3">
+        <Image
+          alt="nextui logo"
+          height={40}
+          radius="sm"
+          src="images/metawin.ico"
+          width={40}
+        />
+        <div className="flex flex-col">
+          <p className="text-md">Metawin&nbsp;<FontAwesomeIcon icon={faCertificate} style={{color: "#1c5ece",}} /></p>
+          <p className="text-small text-default-500">metawin.com</p>
+        </div>
+      </CardHeader>
+      <Divider/>
+      <CardBody>
+        <p>Explore Metawin Features</p>
+      </CardBody>
+      <Divider/>
+      <CardFooter>
+        <Link
+          isExternal
+          showAnchorIcon
+          href="/explore?project=Metawin"
+        >
+          Explore Metawin
+        </Link>
+      </CardFooter>
+    </Card>
+    <Card className="max-w-[400px]">
+      <CardHeader className="flex gap-3">
+        <Image
+          alt="nextui logo"
+          height={40}
+          radius="sm"
+          src="images/cheelee.ico"
+          width={40}
+        />
+        <div className="flex flex-col">
+          <p className="text-md">Cheelee&nbsp;<FontAwesomeIcon icon={faCertificate} style={{color: "#1c5ece",}} /></p>
+          <p className="text-small text-default-500">cheelee.io</p>
+        </div>
+      </CardHeader>
+      <Divider/>
+      <CardBody>
+        <p>Explore Cheelee Features</p>
+      </CardBody>
+      <Divider/>
+      <CardFooter>
+        <Link
+          isExternal
+          showAnchorIcon
+          href="/explore?project=Cheelee"
+        >
+          Explore Cheelee
+        </Link>
+      </CardFooter>
+    </Card>
+    <Card className="max-w-[400px]">
+      <CardHeader className="flex gap-3">
+        <Image
+          alt="nextui logo"
+          height={40}
+          radius="sm"
+          src="images/arcomia.png"
+          width={40}
+        />
+        <div className="flex flex-col">
+          <p className="text-md">Arcomia Metaverse&nbsp;<FontAwesomeIcon icon={faCertificate} style={{color: "#1c5ece",}} /></p>
+          <p className="text-small text-default-500">arcomia.io</p>
+        </div>
+      </CardHeader>
+      <Divider/>
+      <CardBody>
+        <p>Explore Arcomia Metaverse Features</p>
+      </CardBody>
+      <Divider/>
+      <CardFooter>
+        <Link
+          isExternal
+          showAnchorIcon
+          href="/explore?project=Arcomia Metaverse"
+        >
+          Explore Arcomia Metaverse
+        </Link>
+      </CardFooter>
+    </Card>
+    <Card className="max-w-[400px]">
+      <CardHeader className="flex gap-3">
+        <Image
+          alt="nextui logo"
+          height={40}
+          radius="sm"
+          src="images/mar3ai.png"
+          width={40}
+        />
+        <div className="flex flex-col">
+          <p className="text-md">Mar3ai&nbsp;<FontAwesomeIcon icon={faCertificate} style={{color: "#1c5ece",}} /></p>
+          <p className="text-small text-default-500">mar3.ai</p>
+        </div>
+      </CardHeader>
+      <Divider/>
+      <CardBody>
+        <p>Explore Mar3ai Features</p>
+      </CardBody>
+      <Divider/>
+      <CardFooter>
+        <Link
+          isExternal
+          showAnchorIcon
+          href="/explore?project=Mar3ai"
+        >
+          Explore Mar3ai
+        </Link>
+      </CardFooter>
+    </Card>
+    <Card className="max-w-[400px]">
+      <CardHeader className="flex gap-3">
+        <Image
+          alt="nextui logo"
+          height={40}
+          radius="sm"
+          src="images/dew.svg"
+          width={40}
+        />
+        <div className="flex flex-col">
+          <p className="text-md">Dew&nbsp;<FontAwesomeIcon icon={faCertificate} style={{color: "#1c5ece",}} /></p>
+          <p className="text-small text-default-500">dew.gg</p>
+        </div>
+      </CardHeader>
+      <Divider/>
+      <CardBody>
+        <p>Explore Dew Features</p>
+      </CardBody>
+      <Divider/>
+      <CardFooter>
+        <Link
+          isExternal
+          showAnchorIcon
+          href="/explore?project=Dew"
+        >
+          Explore Dew
+        </Link>
+      </CardFooter>
+    </Card>
+    <Card className="max-w-[400px]">
+      <CardHeader className="flex gap-3">
+        <Image
+          alt="nextui logo"
+          height={40}
+          radius="sm"
+          src="images/masa.ico"
+          width={40}
+        />
+        <div className="flex flex-col">
+          <p className="text-md">Masa&nbsp;<FontAwesomeIcon icon={faCertificate} style={{color: "#1c5ece",}} /></p>
+          <p className="text-small text-default-500">masa.finance</p>
+        </div>
+      </CardHeader>
+      <Divider/>
+      <CardBody>
+        <p>Explore Masa Features</p>
+      </CardBody>
+      <Divider/>
+      <CardFooter>
+        <Link
+          isExternal
+          showAnchorIcon
+          href="/explore?project=Masa"
+        >
+          Explore Masa
+        </Link>
+      </CardFooter>
+    </Card>
+    <Card className="max-w-[400px]">
+      <CardHeader className="flex gap-3">
+        <Image
+          alt="nextui logo"
+          height={40}
+          radius="sm"
+          src="images/bgtrade.ico"
+          width={40}
+        />
+        <div className="flex flex-col">
+          <p className="text-md">BGTrade&nbsp;<FontAwesomeIcon icon={faCertificate} style={{color: "#1c5ece",}} /></p>
+          <p className="text-small text-default-500">bgtrade.io</p>
+        </div>
+      </CardHeader>
+      <Divider/>
+      <CardBody>
+        <p>Explore BGTrade Features</p>
+      </CardBody>
+      <Divider/>
+      <CardFooter>
+        <Link
+          isExternal
+          showAnchorIcon
+          href="/explore?project=BGTrade"
+        >
+          Explore BGTrade
+        </Link>
+      </CardFooter>
+    </Card>
+    <Card className="max-w-[400px]">
+      <CardHeader className="flex gap-3">
+        <Image
+          alt="nextui logo"
+          height={40}
+          radius="sm"
+          src="images/ambit.png"
+          width={40}
+        />
+        <div className="flex flex-col">
+          <p className="text-md">Ambit Finance&nbsp;<FontAwesomeIcon icon={faCertificate} style={{color: "#1c5ece",}} /></p>
+          <p className="text-small text-default-500">ambitfi.com</p>
+        </div>
+      </CardHeader>
+      <Divider/>
+      <CardBody>
+        <p>Explore Ambit Finance Features</p>
+      </CardBody>
+      <Divider/>
+      <CardFooter>
+        <Link
+          isExternal
+          showAnchorIcon
+          href="/explore?project=Ambit Finance"
+        >
+          Explore Ambit Finance
+        </Link>
+      </CardFooter>
+    </Card>
+    <Card className="max-w-[400px]">
+      <CardHeader className="flex gap-3">
+        <Image
+          alt="nextui logo"
+          height={40}
+          radius="sm"
+          src="images/zkpass.ico"
+          width={40}
+        />
+        <div className="flex flex-col">
+          <p className="text-md">ZkPass&nbsp;<FontAwesomeIcon icon={faCertificate} style={{color: "#1c5ece",}} /></p>
+          <p className="text-small text-default-500">zkpass.org</p>
+        </div>
+      </CardHeader>
+      <Divider/>
+      <CardBody>
+        <p>Explore ZkPass Features</p>
+      </CardBody>
+      <Divider/>
+      <CardFooter>
+        <Link
+          isExternal
+          showAnchorIcon
+          href="/explore?project=ZkPass"
+        >
+          Explore ZkPass
+        </Link>
+      </CardFooter>
+    </Card>
+    <Card className="max-w-[400px]">
+      <CardHeader className="flex gap-3">
+        <Image
+          alt="nextui logo"
+          height={40}
+          radius="sm"
+          src="images/readon.svg"
+          width={40}
+        />
+        <div className="flex flex-col">
+          <p className="text-md">Readon&nbsp;<FontAwesomeIcon icon={faCertificate} style={{color: "#1c5ece",}} /></p>
+          <p className="text-small text-default-500">readon.me</p>
+        </div>
+      </CardHeader>
+      <Divider/>
+      <CardBody>
+        <p>Explore Readon Features</p>
+      </CardBody>
+      <Divider/>
+      <CardFooter>
+        <Link
+          isExternal
+          showAnchorIcon
+          href="/explore?project=Readon"
+        >
+          Explore Readon
+        </Link>
+      </CardFooter>
+    </Card>
+    <Card className="max-w-[400px]">
+      <CardHeader className="flex gap-3">
+        <Image
+          alt="nextui logo"
+          height={40}
+          radius="sm"
+          src="images/mendi.svg"
+          width={40}
+        />
+        <div className="flex flex-col">
+          <p className="text-md">Mendi Finance&nbsp;<FontAwesomeIcon icon={faCertificate} style={{color: "#1c5ece",}} /></p>
+          <p className="text-small text-default-500">mendi.finance</p>
+        </div>
+      </CardHeader>
+      <Divider/>
+      <CardBody>
+        <p>Explore mendi Finance Features</p>
+      </CardBody>
+      <Divider/>
+      <CardFooter>
+        <Link
+          isExternal
+          showAnchorIcon
+          href="/explore?project=Mendi Finance"
+        >
+          Explore Mendi Finance
+        </Link>
+      </CardFooter>
+    </Card>
+    <Card className="max-w-[400px]">
+      <CardHeader className="flex gap-3">
+        <Image
+          alt="nextui logo"
+          height={40}
+          radius="sm"
+          src="images/sparta.ico"
+          width={40}
+        />
+        <div className="flex flex-col">
+          <p className="text-md">SpartaDEX&nbsp;<FontAwesomeIcon icon={faCertificate} style={{color: "#1c5ece",}} /></p>
+          <p className="text-small text-default-500">spartadex.io</p>
+        </div>
+      </CardHeader>
+      <Divider/>
+      <CardBody>
+        <p>Explore SpartaDEX Features</p>
+      </CardBody>
+      <Divider/>
+      <CardFooter>
+        <Link
+          isExternal
+          showAnchorIcon
+          href="/explore?project=SpartaDEX"
+        >
+          Explore SpartaDEX
+        </Link>
+      </CardFooter>
+    </Card>
+    <Card className="max-w-[400px]">
+      <CardHeader className="flex gap-3">
+        <Image
+          alt="nextui logo"
+          height={40}
+          radius="sm"
+          src="images/vp.ico"
+          width={40}
+        />
+        <div className="flex flex-col">
+          <p className="text-md">Vision Protocol&nbsp;<FontAwesomeIcon icon={faCertificate} style={{color: "#1c5ece",}} /></p>
+          <p className="text-small text-default-500">vp.xyz</p>
+        </div>
+      </CardHeader>
+      <Divider/>
+      <CardBody>
+        <p>Explore Vision Protocol Features</p>
+      </CardBody>
+      <Divider/>
+      <CardFooter>
+        <Link
+          isExternal
+          showAnchorIcon
+          href="/explore?project=Vision Protocol"
+        >
+          Explore Vision Protocol
+        </Link>
+      </CardFooter>
+    </Card>
+    <Card className="max-w-[400px]">
+      <CardHeader className="flex gap-3">
+        <Image
+          alt="nextui logo"
+          height={40}
+          radius="sm"
+          src="images/taskon.svg"
+          width={40}
+        />
+        <div className="flex flex-col">
+          <p className="text-md">Taskon&nbsp;<FontAwesomeIcon icon={faCertificate} style={{color: "#1c5ece",}} /></p>
+          <p className="text-small text-default-500">taskon.xyz</p>
+        </div>
+      </CardHeader>
+      <Divider/>
+      <CardBody>
+        <p>Explore Taskon Features</p>
+      </CardBody>
+      <Divider/>
+      <CardFooter>
+        <Link
+          isExternal
+          showAnchorIcon
+          href="/explore?project=Taskon"
+        >
+          Explore Taskon
+        </Link>
+      </CardFooter>
+    </Card>
+    </div>
+</div>
   );
 };
 
