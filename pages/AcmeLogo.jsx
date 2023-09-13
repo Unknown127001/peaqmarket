@@ -1,5 +1,5 @@
 import React from "react";
-export const AcmeLogo = () => (
+const AcmeLogo = (props) => (
   <svg fill="none" height="36" viewBox="0 0 32 32" width="36">
     <path
       clipRule="evenodd"
@@ -9,3 +9,4 @@ export const AcmeLogo = () => (
     />
   </svg>
 );
+export default AcmeLogo;
